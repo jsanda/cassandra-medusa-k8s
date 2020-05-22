@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: cassandra
+    cluster: medusa-dev
+  name: cassandra
+spec:
+  clusterIP: None
+  ports:
+  - name: intra
+    port: 7000
+    protocol: TCP
+    targetPort: 7000
+  - name: tls
+    port: 7001
+    protocol: TCP
+    targetPort: 7001
+  - name: jmx
+    port: 7199
+    protocol: TCP
+    targetPort: 7199
+  - name: cql
+    port: 9042
+    protocol: TCP
+    targetPort: 9042
+  - name: thrift
+    port: 9160
+    protocol: TCP
+    targetPort: 9160
+  selector:
+    app: cassandra
+    cluster: medusa-dev
+  sessionAffinity: None
+  type: ClusterIP
