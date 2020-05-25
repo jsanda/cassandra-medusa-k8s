@@ -8,6 +8,7 @@ if [ "$#" -eq 0 ] || [ "${1#-}" != "$1" ]; then
 fi
 
 mkdir -p $CASSANDRA_CONF
+mv /tmp/cassandra-env.sh $CASSANDRA_HOME/conf
 cp -R $CASSANDRA_HOME/conf/* $CASSANDRA_CONF
 #mv "$CASSANDRA_HOME/conf" "$CASSANDRA_CONF"
 #rmdir $CASSANDRA_HOME/conf

@@ -139,6 +139,7 @@ RUN set -eux; \
 	chmod 777 /var/lib/cassandra /var/log/cassandra; \
 	ln -sT /var/lib/cassandra "$CASSANDRA_HOME/data"; \
 	ln -sT /var/log/cassandra "$CASSANDRA_HOME/logs"; \
+	mkdir /jolokia; \
 	\
 # smoke test
 	cassandra -v
@@ -146,6 +147,9 @@ RUN set -eux; \
 VOLUME /var/lib/cassandra
 
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY jolokia-jvm-1.6.2-agent.jar /jolokia
+COPY cassandra-env.sh /tmp
+
 RUN ln -s usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]
 
