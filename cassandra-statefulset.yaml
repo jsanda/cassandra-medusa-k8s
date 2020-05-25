@@ -20,6 +20,11 @@ spec:
         app: cassandra
         cluster: medusa-dev
     spec:
+      securityContext:
+        runAsNonRoot: true
+        fsGroup: 999
+        runAsUser: 999
+        runAsGroup: 999
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -57,7 +62,8 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: status.podIP
-        image: cassandra:3.11.6
+        image: jsanda/cassandra:3.11.6-debug-5
+        #image: bitnami/cassandra:3.11.6
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
@@ -100,16 +106,18 @@ spec:
           timeoutSeconds: 5
         resources:
           limits:
-            cpu: "1"
-            memory: 1Gi
+            cpu: "2"
+            memory: 2Gi
           requests:
-            cpu: "1"
-            memory: 1Gi
+            cpu: "2"
+            memory: 2Gi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /var/lib/cassandra
           name: data
+        - name: cassandra-config
+          mountPath: /etc/cassandra
       - name: medusa
         image: jsanda/medusa:grpc-latest
         ports:
@@ -129,7 +137,11 @@ spec:
           - name: medusa-config
             mountPath: /etc/medusa/medusa.ini
             subPath: medusa.ini
+          - name: cassandra-config
+            mountPath: /etc/cassandra
       volumes:
+        - name: cassandra-config
+          emptyDir: {}
         - name: medusa-gcp-key
           configMap: 
             name: medusa-gcp-key
