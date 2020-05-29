@@ -63,7 +63,6 @@ spec:
               apiVersion: v1
               fieldPath: status.podIP
         image: jsanda/cassandra:3.11.6-debug-5
-        #image: bitnami/cassandra:3.11.6
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
@@ -119,9 +118,15 @@ spec:
         - name: cassandra-config
           mountPath: /etc/cassandra
       - name: medusa
-        image: jsanda/medusa:grpc-latest
+        image: jsanda/medusa:grpc-dev
+        imagePullPolicy: Always
         ports:
         - containerPort: 50051
+        # I temporarily introduced a flag in the medusa gRPC service to put it to sleep
+        # to make it easier to debug issues with the medusa image.
+        #env:
+        #- name: DEBUG_SLEEP
+        #  value: "300"
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:50051"]
@@ -139,6 +144,8 @@ spec:
             subPath: medusa.ini
           - name: cassandra-config
             mountPath: /etc/cassandra
+          - mountPath: /var/lib/cassandra
+            name: data
       volumes:
         - name: cassandra-config
           emptyDir: {}
