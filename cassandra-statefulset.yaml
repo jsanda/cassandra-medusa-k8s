@@ -20,11 +20,6 @@ spec:
         app: cassandra
         cluster: medusa-dev
     spec:
-      securityContext:
-        runAsNonRoot: true
-        fsGroup: 999
-        runAsUser: 999
-        runAsGroup: 999
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -41,6 +36,8 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - env:
+        #- name: DEBUG_SLEEP
+        #  value: "180"
         - name: CASSANDRA_SEEDS
           value: cassandra-0.cassandra.medusa.svc.cluster.local,cassandra-1.cassandra.medusa.svc.cluster.local
         - name: MAX_HEAP_SIZE
@@ -62,8 +59,12 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: status.podIP
-        image: jsanda/cassandra:3.11.6-debug-5
-        imagePullPolicy: IfNotPresent
+        image: jsanda/cassandra:3.11.6-dev
+        imagePullPolicy: Always
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 999
+          runAsGroup: 999
         livenessProbe:
           exec:
             command:
