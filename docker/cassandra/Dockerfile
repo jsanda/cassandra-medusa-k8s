@@ -49,6 +49,7 @@ RUN set -eux; \
 ENV CASSANDRA_HOME /opt/cassandra
 ENV CASSANDRA_CONF /etc/cassandra
 ENV PATH $CASSANDRA_HOME/bin:$PATH
+ENV DEBUG_SLEEP 0
 
 # https://cwiki.apache.org/confluence/display/CASSANDRA2/DebianPackaging#DebianPackaging-AddingRepositoryKeys
 ENV GPG_KEYS \
@@ -61,6 +62,8 @@ ENV GPG_KEYS \
 
 ENV CASSANDRA_VERSION 3.11.6
 ENV CASSANDRA_SHA512 0e778f8fb4a050fde3ec174a9ca365e49ef437cd9e61280b6b4dcba950418a3d04a104bb41aed1add858e2acc2513cf7df4065ca5ca751dd1daf60e70adc4042
+
+COPY cassandra-env.sh /tmp
 
 RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
@@ -135,8 +138,10 @@ RUN set -eux; \
 	mkdir -p /var/lib/cassandra /var/log/cassandra; \
 	#chown -R cassandra:cassandra "$CASSANDRA_CONF" /var/lib/cassandra /var/log/cassandra; \
 	chown -R cassandra:cassandra /var/lib/cassandra /var/log/cassandra; \
+	chown -R cassandra:cassandra $CASSANDRA_HOME; \
 	#chmod 777 "$CASSANDRA_CONF" /var/lib/cassandra /var/log/cassandra; \
 	chmod 777 /var/lib/cassandra /var/log/cassandra; \
+	chmod 644 /tmp/cassandra-env.sh; \
 	ln -sT /var/lib/cassandra "$CASSANDRA_HOME/data"; \
 	ln -sT /var/log/cassandra "$CASSANDRA_HOME/logs"; \
 	mkdir /jolokia; \
@@ -148,7 +153,6 @@ VOLUME /var/lib/cassandra
 
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY jolokia-jvm-1.6.2-agent.jar /jolokia
-COPY cassandra-env.sh /tmp
 
 RUN ln -s usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]

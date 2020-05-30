@@ -7,9 +7,12 @@ if [ "$#" -eq 0 ] || [ "${1#-}" != "$1" ]; then
 	set -- cassandra -f "$@"
 fi
 
+echo "sleeping for $DEBUG_SLEEP sec"
+sleep $DEBUG_SLEEP
+
 mkdir -p $CASSANDRA_CONF
-mv /tmp/cassandra-env.sh $CASSANDRA_HOME/conf
 cp -R $CASSANDRA_HOME/conf/* $CASSANDRA_CONF
+cp /tmp/cassandra-env.sh $CASSANDRA_HOME/conf
 #mv "$CASSANDRA_HOME/conf" "$CASSANDRA_CONF"
 #rmdir $CASSANDRA_HOME/conf
 #ln -sT "$CASSANDRA_CONF" "$CASSANDRA_HOME/conf";
