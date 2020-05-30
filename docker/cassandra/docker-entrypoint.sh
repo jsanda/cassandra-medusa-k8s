@@ -11,8 +11,8 @@ echo "sleeping for $DEBUG_SLEEP sec"
 sleep $DEBUG_SLEEP
 
 mkdir -p $CASSANDRA_CONF
-cp -R $CASSANDRA_HOME/conf/* $CASSANDRA_CONF
 cp /tmp/cassandra-env.sh $CASSANDRA_HOME/conf
+cp -R $CASSANDRA_HOME/conf/* $CASSANDRA_CONF
 #mv "$CASSANDRA_HOME/conf" "$CASSANDRA_CONF"
 #rmdir $CASSANDRA_HOME/conf
 #ln -sT "$CASSANDRA_CONF" "$CASSANDRA_HOME/conf";
