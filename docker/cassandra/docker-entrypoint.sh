@@ -7,9 +7,6 @@ if [ "$#" -eq 0 ] || [ "${1#-}" != "$1" ]; then
 	set -- cassandra -f "$@"
 fi
 
-echo "sleeping for $DEBUG_SLEEP sec"
-sleep $DEBUG_SLEEP
-
 mkdir -p $CASSANDRA_CONF
 cp /tmp/cassandra-env.sh $CASSANDRA_HOME/conf
 cp -R $CASSANDRA_HOME/conf/* $CASSANDRA_CONF
@@ -37,6 +34,9 @@ if [ "$1" = 'cassandra' -a "$(id -u)" = '0' ]; then
 	echo "EXEC: $@" && \
 	exec gosu cassandra "$BASH_SOURCE" "$@"
 fi
+
+echo "sleeping for $DEBUG_SLEEP sec"
+sleep $DEBUG_SLEEP
 
 _ip_address() {
 	# scrape the first non-localhost IP address of the container

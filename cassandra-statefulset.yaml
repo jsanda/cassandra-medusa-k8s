@@ -61,10 +61,10 @@ spec:
               fieldPath: status.podIP
         image: jsanda/cassandra:3.11.6-dev
         imagePullPolicy: Always
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 999
-          runAsGroup: 999
+        #securityContext:
+        #  runAsNonRoot: true
+        #  runAsUser: 999
+        #  runAsGroup: 999
         livenessProbe:
           exec:
             command:

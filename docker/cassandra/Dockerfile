@@ -144,6 +144,7 @@ RUN set -eux; \
 	chmod 644 /tmp/cassandra-env.sh; \
 	ln -sT /var/lib/cassandra "$CASSANDRA_HOME/data"; \
 	ln -sT /var/log/cassandra "$CASSANDRA_HOME/logs"; \
+	chown -R cassandra:cassandra $CASSANDRA_HOME/data $CASSANDRA_HOME/logs; \
 	mkdir /jolokia; \
 	\
 # smoke test
