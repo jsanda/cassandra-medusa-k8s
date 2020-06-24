@@ -125,9 +125,11 @@ spec:
         - containerPort: 50051
         # I temporarily introduced a flag in the medusa gRPC service to put it to sleep
         # to make it easier to debug issues with the medusa image.
-        #env:
+        env:
         #- name: DEBUG_SLEEP
         #  value: "300"
+        - name: MEDUSA_MODE
+          value: GRPC
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:50051"]
@@ -136,6 +138,35 @@ spec:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:50051"]
           initialDelaySeconds: 10
+        volumeMounts:
+          - name: medusa-gcp-key
+            mountPath: /etc/medusa/medusa_gcp_key.json
+            subPath: medusa_gcp_key.json
+          - name: medusa-config
+            mountPath: /etc/medusa/medusa.ini
+            subPath: medusa.ini
+          - name: cassandra-config
+            mountPath: /etc/cassandra
+          - mountPath: /var/lib/cassandra
+            name: data
+      initContainers:
+      - name: medusa-restore
+        image: jsanda/medusa:grpc-dev
+        imagePullPolicy: Always
+        env:
+        - name: MEDUSA_MODE
+          value: RESTORE
+        - name: BACKUP_NAME
+          value: operator-test-116
+        - name: DEBUG_SLEEP
+          value: "300"
+      #- name: envar-test
+      #  image: busybox
+      #  command: ["/bin/sh", "-c", "echo BACKUP_NAME = $BACKUP_NAME"]
+        #command: ["/bin/sh", "-c", "echo TEST"]
+      #  env:
+      #  - name: BACKUP_NAME
+      #    value: ANOTHER TEST
         volumeMounts:
           - name: medusa-gcp-key
             mountPath: /etc/medusa/medusa_gcp_key.json
@@ -176,6 +207,7 @@ spec:
         cluster: medusa-dev
       name: data
     spec:
+      storageClassName: pd-csi
       accessModes:
       - ReadWriteOnce
       resources:
