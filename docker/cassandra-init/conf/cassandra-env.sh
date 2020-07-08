@@ -309,5 +309,5 @@ JVM_OPTS="$JVM_OPTS -Djava.library.path=$CASSANDRA_HOME/lib/sigar-bin"
 
 JVM_OPTS="$JVM_OPTS $MX4J_ADDRESS"
 JVM_OPTS="$JVM_OPTS $MX4J_PORT"
-JVM_OPTS="$JVM_OPTS -javaagent:/jolokia/jolokia-jvm-1.6.2-agent.jar=port=8778,host=localhost"
+JVM_OPTS="$JVM_OPTS -javaagent:/etc/cassandra/jolokia-agent.jar=port=8778,host=localhost"
 JVM_OPTS="$JVM_OPTS $JVM_EXTRA_OPTS"

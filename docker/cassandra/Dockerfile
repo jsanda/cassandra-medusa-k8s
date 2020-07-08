@@ -63,8 +63,6 @@ ENV GPG_KEYS \
 ENV CASSANDRA_VERSION 3.11.6
 ENV CASSANDRA_SHA512 0e778f8fb4a050fde3ec174a9ca365e49ef437cd9e61280b6b4dcba950418a3d04a104bb41aed1add858e2acc2513cf7df4065ca5ca751dd1daf60e70adc4042
 
-COPY cassandra-env.sh /tmp
-
 RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
@@ -119,18 +117,7 @@ RUN set -eux; \
 	dpkgArch="$(dpkg --print-architecture)"; \
 	case "$dpkgArch" in \
 		ppc64el) \
-# https://issues.apache.org/jira/browse/CASSANDRA-13345
-# "The stack size specified is too small, Specify at least 328k"
-			#if grep -q -- '^-Xss' "$CASSANDRA_CONF/jvm.options"; then \
-# 3.11+ (jvm.options)
-				#grep -- '^-Xss256k$' "$CASSANDRA_CONF/jvm.options"; \
-				#sed -ri 's/^-Xss256k$/-Xss512k/' "$CASSANDRA_CONF/jvm.options"; \
-				#grep -- '^-Xss512k$' "$CASSANDRA_CONF/jvm.options"; \
-			#elif grep -q -- '-Xss256k' "$CASSANDRA_CONF/cassandra-env.sh"; then \
-# 3.0 (cassandra-env.sh)
-				#sed -ri 's/-Xss256k/-Xss512k/g' "$CASSANDRA_CONF/cassandra-env.sh"; \
-				#grep -- '-Xss512k' "$CASSANDRA_CONF/cassandra-env.sh"; \
-			#fi; \
+
 			;; \
 	esac; \
 	\
@@ -141,7 +128,7 @@ RUN set -eux; \
 	chown -R cassandra:cassandra $CASSANDRA_HOME; \
 	#chmod 777 "$CASSANDRA_CONF" /var/lib/cassandra /var/log/cassandra; \
 	chmod 777 /var/lib/cassandra /var/log/cassandra; \
-	chmod 644 /tmp/cassandra-env.sh; \
+	#chmod 644 /tmp/cassandra-env.sh; \
 	ln -sT /var/lib/cassandra "$CASSANDRA_HOME/data"; \
 	ln -sT /var/log/cassandra "$CASSANDRA_HOME/logs"; \
 	chown -R cassandra:cassandra $CASSANDRA_HOME/data $CASSANDRA_HOME/logs; \
@@ -153,7 +140,6 @@ RUN set -eux; \
 VOLUME /var/lib/cassandra
 
 COPY docker-entrypoint.sh /usr/local/bin/
-COPY jolokia-jvm-1.6.2-agent.jar /jolokia
 
 RUN ln -s usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]
@@ -164,4 +150,4 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 # 9042: CQL
 # 9160: thrift service
 EXPOSE 7000 7001 7199 9042 9160
-CMD ["cassandra", "-f"]
+CMD ["cassandra", "-R", "-f"]
