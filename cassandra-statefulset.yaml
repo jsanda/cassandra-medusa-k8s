@@ -35,32 +35,13 @@ spec:
                   - medusa-dev
               topologyKey: "kubernetes.io/hostname"
       containers:
-      - env:
-        #- name: DEBUG_SLEEP
-        #  value: "180"
-        - name: CASSANDRA_SEEDS
-          value: cassandra-0.cassandra.medusa.svc.cluster.local,cassandra-1.cassandra.medusa.svc.cluster.local
-        - name: MAX_HEAP_SIZE
-          value: 512M
-        - name: HEAP_NEWSIZE
-          value: 512M
-        - name: CASSANDRA_ENDPOINT_SNITCH
-          value: SimpleSnitch
-        - name: CASSANDRA_CLUSTER_NAME
-          value: medusa-dev
-        - name: CASSANDRA_DC
-          value: DC1
-        - name: CASSANDRA_RACK
-          value: RAC1
-        - name: CASSANDRA_START_RPC
-          value: "false"
-        - name: POD_IP
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: status.podIP
+      - name: cassandra
         image: jsanda/cassandra:3.11.6-dev
+        #image: cassandra:3.11.6
         imagePullPolicy: Always
+        env:
+        #- name: DEBUG_SLEEP
+        #  value: "300"
         #securityContext:
         #  runAsNonRoot: true
         #  runAsUser: 999
@@ -76,7 +57,6 @@ spec:
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 5
-        name: cassandra
         ports:
         - containerPort: 7000
           name: intra
@@ -100,7 +80,7 @@ spec:
             - -c
             - nodetool status | grep -E "^UN\s+${POD_IP}"
           failureThreshold: 3
-          initialDelaySeconds: 90
+          initialDelaySeconds: 60
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 5
@@ -150,6 +130,36 @@ spec:
           - mountPath: /var/lib/cassandra
             name: data
       initContainers:
+      - name: init-cassandra-config
+        image: jsanda/init-cassandra-config:dev
+        imagePullPolicy: Always
+        env:
+        - name: CASSANDRA_SEEDS
+          value: cassandra-0.cassandra.medusa.svc.cluster.local,cassandra-1.cassandra.medusa.svc.cluster.local
+        - name: MAX_HEAP_SIZE
+          value: 512M
+        - name: HEAP_NEWSIZE
+          value: 512M
+        - name: CASSANDRA_ENDPOINT_SNITCH
+          value: SimpleSnitch
+        - name: CASSANDRA_CLUSTER_NAME
+          value: medusa-dev
+        - name: CASSANDRA_DC
+          value: DC1
+        - name: CASSANDRA_RACK
+          value: RAC1
+        - name: CASSANDRA_START_RPC
+          value: "false"
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        volumeMounts:
+          - name: cassandra-config
+            mountPath: /etc/cassandra
+          - mountPath: /var/lib/cassandra
+            name: data
       - name: medusa-restore
         image: jsanda/medusa:grpc-dev
         imagePullPolicy: Always
@@ -158,15 +168,8 @@ spec:
           value: RESTORE
         - name: BACKUP_NAME
           value: operator-test-116
-        - name: DEBUG_SLEEP
-          value: "300"
-      #- name: envar-test
-      #  image: busybox
-      #  command: ["/bin/sh", "-c", "echo BACKUP_NAME = $BACKUP_NAME"]
-        #command: ["/bin/sh", "-c", "echo TEST"]
-      #  env:
-      #  - name: BACKUP_NAME
-      #    value: ANOTHER TEST
+        #- name: DEBUG_SLEEP
+        #  value: "300"
         volumeMounts:
           - name: medusa-gcp-key
             mountPath: /etc/medusa/medusa_gcp_key.json
