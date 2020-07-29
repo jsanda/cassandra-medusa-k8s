@@ -166,8 +166,8 @@ spec:
         env:
         - name: MEDUSA_MODE
           value: RESTORE
-        - name: BACKUP_NAME
-          value: operator-test-116
+        #- name: BACKUP_NAME
+        #  value: operator-test-116
         #- name: DEBUG_SLEEP
         #  value: "300"
         volumeMounts:

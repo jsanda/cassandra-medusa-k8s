@@ -1,0 +1,10 @@
+apiVersion: cassandra-medusa.io/v1alpha1
+kind: CassandraBackup
+metadata:
+  name: demo
+spec:
+  name: demo
+  labelSelector:
+    matchLabels:
+      app: cassandra
+      cluster: medusa-dev
